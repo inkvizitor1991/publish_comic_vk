@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from download_random_comic import (
     get_last_comic_number,
     download_comic_image,
-    parse_comic
+    fetch_comic
 )
 
 
@@ -80,7 +80,7 @@ if __name__ == '__main__':
     vk_api_version = '5.131'
 
     last_comic_number = get_last_comic_number()
-    comic_link, comic_comment = parse_comic(last_comic_number)
+    comic_link, comic_comment = fetch_comic(last_comic_number)
     download_comic_image(filename, comic_link)
 
     upload_image_url = get_upload_image_url(group_id, vk_token, vk_api_version)

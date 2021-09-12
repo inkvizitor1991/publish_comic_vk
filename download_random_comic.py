@@ -11,7 +11,7 @@ def get_last_comic_number():
     return last_comic_number
 
 
-def parse_comic(last_comic_number):
+def fetch_comic(last_comic_number):
     while True:
         number = random.randint(1, last_comic_number)
         url = f'https://xkcd.com/{number}/info.0.json'
