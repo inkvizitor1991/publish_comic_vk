@@ -24,7 +24,7 @@ def get_upload_image_url(group_id, access_token, vk_api_version):
     return upload_image_url
 
 
-def uploading_on_server_image(filename, upload_image_url):
+def upload_on_server_image(filename, upload_image_url):
     with open(filename, 'rb') as file:
         url = upload_image_url
         files = {
@@ -84,7 +84,7 @@ if __name__ == '__main__':
     download_comic_image(filename, comic_link)
 
     upload_image_url = get_upload_image_url(group_id, vk_token, vk_api_version)
-    uploaded_image = uploading_on_server_image(filename, upload_image_url)
+    uploaded_image = upload_on_server_image(filename, upload_image_url)
     saved_image = save_vk_image(
         group_id, vk_token,
         uploaded_image, vk_api_version
