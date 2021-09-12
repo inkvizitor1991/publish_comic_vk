@@ -11,7 +11,7 @@ from download_random_comic import (
 )
 
 
-def get_upload_image_url(group_id, access_token, vk_api_version):
+def get_upload_url(group_id, access_token, vk_api_version):
     url = 'https://api.vk.com/method/photos.getWallUploadServer'
     params = {
         'group_id': group_id,
@@ -20,13 +20,13 @@ def get_upload_image_url(group_id, access_token, vk_api_version):
     }
     response = requests.post(url, params=params)
     response.raise_for_status()
-    upload_image_url = response.json()['response']['upload_url']
-    return upload_image_url
+    upload_url = response.json()['response']['upload_url']
+    return upload_url
 
 
-def upload_on_server_image(filename, upload_image_url):
+def upload_image(filename, upload_url):
     with open(filename, 'rb') as file:
-        url = upload_image_url
+        url = upload_url
         files = {
             'photo': file,
         }
@@ -83,8 +83,8 @@ if __name__ == '__main__':
     comic_link, comic_comment = fetch_comic(last_comic_number)
     download_comic_image(filename, comic_link)
 
-    upload_image_url = get_upload_image_url(group_id, vk_token, vk_api_version)
-    uploaded_image = upload_on_server_image(filename, upload_image_url)
+    upload_url = get_upload_url(group_id, vk_token, vk_api_version)
+    uploaded_image = upload_image(filename, upload_url)
     owner_id, image_id = save_vk_image(
         group_id, vk_token,
         uploaded_image, vk_api_version
