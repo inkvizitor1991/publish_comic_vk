@@ -50,9 +50,9 @@ def save_vk_image(group_id, vk_token, uploaded_image, vk_api_version):
     response = requests.post(url, params=params)
     response.raise_for_status()
     saved_image = response.json()['response']
-    for param in saved_image:
-        owner_id = param['owner_id']
-        image_id = param['id']
+    for params in saved_image:
+        owner_id = params['owner_id']
+        image_id = params['id']
         return owner_id, image_id
 
 
