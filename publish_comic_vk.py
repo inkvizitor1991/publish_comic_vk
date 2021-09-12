@@ -33,19 +33,23 @@ def upload_image(filename, upload_url):
         response = requests.post(url, files=files)
         response.raise_for_status()
         uploaded_image = response.json()
-        return uploaded_image
+        server = uploaded_image['server']
+        image = uploaded_image['photo']
+        image_hash = uploaded_image['hash']
+        return server, image, image_hash
 
 
-def save_vk_image(group_id, vk_token, uploaded_image, vk_api_version):
+def save_vk_image(group_id, vk_token, vk_api_version,
+                  server, image, image_hash):
     url = 'https://api.vk.com/method/photos.saveWallPhoto'
 
     params = {
         'group_id': group_id,
         'access_token': vk_token,
         'v': vk_api_version,
-        'server': uploaded_image['server'],
-        'photo': uploaded_image['photo'],
-        'hash': uploaded_image['hash']
+        'server': server,
+        'photo': image,
+        'hash': image_hash
     }
     response = requests.post(url, params=params)
     response.raise_for_status()
@@ -56,9 +60,8 @@ def save_vk_image(group_id, vk_token, uploaded_image, vk_api_version):
         return owner_id, image_id
 
 
-def publish_comic(comic_comment, group_id,
-                  vk_token, vk_api_version,
-                  owner_id, image_id):
+def publish_comic(comic_comment, group_id, vk_token,
+                  vk_api_version, owner_id, image_id):
     url = 'https://api.vk.com/method/wall.post'
     params = {
         'owner_id': -int(group_id),
@@ -84,10 +87,10 @@ if __name__ == '__main__':
     download_comic_image(filename, comic_link)
 
     upload_url = get_upload_url(group_id, vk_token, vk_api_version)
-    uploaded_image = upload_image(filename, upload_url)
+    server, image, image_hash = upload_image(filename, upload_url)
     owner_id, image_id = save_vk_image(
-        group_id, vk_token,
-        uploaded_image, vk_api_version
+        group_id, vk_token, vk_api_version,
+        server, image, image_hash
     )
     publish_comic(
         comic_comment, group_id,
