@@ -49,27 +49,27 @@ def save_vk_image(group_id, vk_token, uploaded_image, vk_api_version):
     }
     response = requests.post(url, params=params)
     response.raise_for_status()
-    saved_image = response.json()
-    return saved_image
+    saved_image = response.json()['response']
+    for param in saved_image:
+        owner_id = param['owner_id']
+        image_id = param['id']
+        return owner_id, image_id
 
 
-def publish_comic(comic_comment, group_id, vk_token, vk_api_version, vk_comic):
+def publish_comic(comic_comment, group_id,
+                  vk_token, vk_api_version,
+                  owner_id, image_id):
     url = 'https://api.vk.com/method/wall.post'
-    for comic in vk_comic['response']:
-        owner_id = comic['owner_id']
-        image_id = comic['id']
-
-        params = {
-            'owner_id': -int(group_id),
-            'access_token': vk_token,
-            'v': vk_api_version,
-            'from_group': 1,
-            'message': comic_comment,
-            'attachments': f'photo{owner_id}_{image_id}'
-        }
-
-        response = requests.post(url, params=params)
-        response.raise_for_status()
+    params = {
+        'owner_id': -int(group_id),
+        'access_token': vk_token,
+        'v': vk_api_version,
+        'from_group': 1,
+        'message': comic_comment,
+        'attachments': f'photo{owner_id}_{image_id}'
+    }
+    response = requests.post(url, params=params)
+    response.raise_for_status()
 
 
 if __name__ == '__main__':
@@ -85,13 +85,13 @@ if __name__ == '__main__':
 
     upload_image_url = get_upload_image_url(group_id, vk_token, vk_api_version)
     uploaded_image = upload_on_server_image(filename, upload_image_url)
-    saved_image = save_vk_image(
+    owner_id, image_id = save_vk_image(
         group_id, vk_token,
         uploaded_image, vk_api_version
     )
     publish_comic(
         comic_comment, group_id,
         vk_token, vk_api_version,
-        saved_image
+        owner_id, image_id
     )
     os.remove(filename)
