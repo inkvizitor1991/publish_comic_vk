@@ -11,6 +11,14 @@ from download_random_comic import (
 )
 
 
+def check_vk_response(response):
+    response.raise_for_status()
+    response = response.json()
+    if 'error' in response:
+        raise requests.HTTPError(response['error']['error_msg'])
+    return response
+
+
 def get_upload_url(group_id, access_token, vk_api_version):
     url = 'https://api.vk.com/method/photos.getWallUploadServer'
     params = {
@@ -19,8 +27,8 @@ def get_upload_url(group_id, access_token, vk_api_version):
         'v': vk_api_version
     }
     response = requests.post(url, params=params)
-    response.raise_for_status()
-    upload_url = response.json()['response']['upload_url']
+    response = check_vk_response(response)
+    upload_url = response['response']['upload_url']
     return upload_url
 
 
@@ -31,12 +39,11 @@ def upload_image(filename, upload_url):
             'photo': file,
         }
         response = requests.post(url, files=files)
-        response.raise_for_status()
-        uploaded_image = response.json()
-        server = uploaded_image['server']
-        image = uploaded_image['photo']
-        image_hash = uploaded_image['hash']
-        return server, image, image_hash
+    response = check_vk_response(response)
+    server = response['server']
+    image = response['photo']
+    image_hash = response['hash']
+    return server, image, image_hash
 
 
 def save_vk_image(group_id, vk_token, vk_api_version,
@@ -52,8 +59,8 @@ def save_vk_image(group_id, vk_token, vk_api_version,
         'hash': image_hash
     }
     response = requests.post(url, params=params)
-    response.raise_for_status()
-    saved_image = response.json()['response']
+    response = check_vk_response(response)
+    saved_image = response['response']
     for params in saved_image:
         owner_id = params['owner_id']
         image_id = params['id']
@@ -72,7 +79,7 @@ def publish_comic(comic_comment, group_id, vk_token,
         'attachments': f'photo{owner_id}_{image_id}'
     }
     response = requests.post(url, params=params)
-    response.raise_for_status()
+    check_vk_response(response)
 
 
 if __name__ == '__main__':
