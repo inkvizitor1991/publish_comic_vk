@@ -32,7 +32,7 @@ def get_upload_url(group_id, access_token, vk_api_version):
     return upload_url
 
 
-def upload_image(filename, upload_url):
+def upload_vk_image(filename, upload_url):
     with open(filename, 'rb') as file:
         url = upload_url
         files = {
@@ -93,15 +93,17 @@ if __name__ == '__main__':
     comic_link, comic_comment = fetch_comic(last_comic_number)
     download_comic_image(filename, comic_link)
 
-    upload_url = get_upload_url(group_id, vk_token, vk_api_version)
-    server, image, image_hash = upload_image(filename, upload_url)
-    owner_id, image_id = save_vk_image(
-        group_id, vk_token, vk_api_version,
-        server, image, image_hash
-    )
-    publish_comic(
-        comic_comment, group_id,
-        vk_token, vk_api_version,
-        owner_id, image_id
-    )
-    os.remove(filename)
+    try:
+        upload_url = get_upload_url(group_id, vk_token, vk_api_version)
+        server, image, image_hash = upload_vk_image(filename, upload_url)
+        owner_id, image_id = save_vk_image(
+            group_id, vk_token, vk_api_version,
+            server, image, image_hash
+        )
+        publish_comic(
+            comic_comment, group_id,
+            vk_token, vk_api_version,
+            owner_id, image_id
+        )
+    finally:
+        os.remove(filename)
