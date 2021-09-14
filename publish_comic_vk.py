@@ -88,10 +88,9 @@ if __name__ == '__main__':
     vk_api_version = '5.131'
 
     last_comic_number = get_last_comic_number()
-    comic_link, comic_comment = fetch_comic(last_comic_number)
-    download_comic_image(filename, comic_link)
-
     try:
+        comic_link, comic_comment = fetch_comic(last_comic_number)
+        download_comic_image(filename, comic_link)
         upload_url = get_upload_url(group_id, vk_token, vk_api_version)
         server, image, image_hash = upload_vk_image(filename, upload_url)
         owner_id, image_id = save_vk_image(
@@ -103,5 +102,7 @@ if __name__ == '__main__':
             vk_token, vk_api_version,
             owner_id, image_id
         )
+    except requests.HTTPError as error:
+        print(error)
     finally:
         os.remove(filename)

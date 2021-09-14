@@ -15,11 +15,7 @@ def fetch_comic(last_comic_number):
     number = random.randint(1, last_comic_number)
     url = f'https://xkcd.com/{number}/info.0.json'
     response = requests.get(url)
-    try:
-        response.raise_for_status()
-    except requests.HTTPError as error:
-        print(f'Ошибка при загрузке страницы с комиксом: {error}')
-
+    response.raise_for_status()
     comic = response.json()
     comic_image_link = comic['img']
     comic_comment = comic['alt']
