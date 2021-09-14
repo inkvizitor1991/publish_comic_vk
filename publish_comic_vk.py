@@ -34,11 +34,10 @@ def get_upload_url(group_id, access_token, vk_api_version):
 
 def upload_vk_image(filename, upload_url):
     with open(filename, 'rb') as file:
-        url = upload_url
         files = {
             'photo': file,
         }
-        response = requests.post(url, files=files)
+        response = requests.post(upload_url, files=files)
     response = check_vk_response(response)
     server = response['server']
     image = response['photo']
@@ -60,11 +59,10 @@ def save_vk_image(group_id, vk_token, vk_api_version,
     }
     response = requests.post(url, params=params)
     response = check_vk_response(response)
-    saved_image = response['response']
-    for params in saved_image:
-        owner_id = params['owner_id']
-        image_id = params['id']
-        return owner_id, image_id
+    saved_image = response['response'][0]
+    owner_id = saved_image['owner_id']
+    image_id = saved_image['id']
+    return owner_id, image_id
 
 
 def publish_comic(comic_comment, group_id, vk_token,
